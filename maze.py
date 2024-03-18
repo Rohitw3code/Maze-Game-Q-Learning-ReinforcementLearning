@@ -6,11 +6,11 @@ import time
 from tqdm import tqdm
 
 # Define colors
-BLACK = (0, 0, 0)
+WALL = (220, 118, 51)
 WHITE = (255, 255, 255)
-GREEN = (0, 255, 0)
+PLAYER = (142, 68, 173)
 RED = (255, 0, 0)
-GOAL = (0, 0, 255)
+GOAL = (46, 134, 193)
 
 # Define constants
 BLOCK_SIZE = 60
@@ -21,8 +21,6 @@ env = np.array([[1, 0, 0, 0],
                 [0, -1, 0, -1],
                 [0, 0, 0, -1],
                 [-1, 0, 0, 2]])
-
-
 
 # Initialize pygame
 pygame.init()
@@ -41,9 +39,9 @@ def draw_maze(env):
         for col in range(len(env[0])):
             color = WHITE
             if env[row][col] == -1:
-                color = BLACK
+                color = WALL
             elif env[row][col] == 1:
-                color = GREEN
+                color = PLAYER
             elif env[row][col] == 2:
                 color = GOAL
             pygame.draw.rect(screen, color, [(MARGIN + BLOCK_SIZE) * col + MARGIN,
@@ -73,12 +71,22 @@ def move_player(dx, dy):
     return False
 
 
+
+
+
 actions = {
     'left':0,
     'down':1,
     'right':2,
     'up':3
 }
+
+# Define the action map
+action_map = {0: 'left',
+              1: 'down',
+              2: 'right',
+              3: 'up'}
+
 
 # Main game loop
 running = True
@@ -88,26 +96,22 @@ while running:
             running = False
 
     if not reached_goal:
-        # Randomly select a direction
-        random_action = rd.choice(list(actions.keys()))
-
+        action = rd.choice([0,1,2,3])        
         # Move the player based on the random action
-        if random_action == 'left':
+        if action_map[action] == 'left':
             move_player(-1, 0)
-        elif random_action == 'down':
+        elif action_map[action] == 'down':
             move_player(0, 1)
-        elif random_action == 'right':
+        elif action_map[action] == 'right':
             move_player(1, 0)
-        elif random_action == 'up':
+        elif action_map[action] == 'up':
             move_player(0, -1)
+
+
 
     screen.fill(WHITE)
     draw_maze(env)
-
     if reached_goal:
-        pygame.draw.rect(screen, RED, [(MARGIN + BLOCK_SIZE) * 3 + MARGIN,
-                                       (MARGIN + BLOCK_SIZE) * 3 + MARGIN,
-                                       BLOCK_SIZE, BLOCK_SIZE])
         pygame.display.flip()
         time.sleep(1)  # Pause for 3 seconds
         reached_goal = False
@@ -117,6 +121,6 @@ while running:
                         [-1, 0, 0, 2]])
 
     pygame.display.flip()
-    clock.tick(10)  # Adjust the speed as needed
+    clock.tick(60)  # Adjust the speed as needed
 
 pygame.quit()
