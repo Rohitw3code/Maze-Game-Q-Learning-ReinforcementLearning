@@ -154,7 +154,7 @@ def move_player(dx, dy):
             if env[row][col] == 1:
                 new_row = row + dy
                 new_col = col + dx
-                if 0 <= new_row < len(env) and 0 <= new_col < len(env[0]) and env[new_row][new_col] != -1:
+                if 0 <= new_row < len(env) and 0 <= new_col < len(env[0]):
                     if env[new_row][new_col] == 2:  # Check if the blue box (goal) is reached
                         env[row][col] = 0
                         env[new_row][new_col] = 1
@@ -208,7 +208,7 @@ def max_random(lst):
 maze = Env()
 state1 = 0
 explore = 80
-mtime = 60
+mtime = 30
 
 # Main game loop
 running = True
@@ -259,7 +259,6 @@ while running:
                         [0, 0, 0, -1],
                         [-1, 0, 0, 2]])
         maze.reset()
-        print("="*20)
 
     pygame.display.flip()
     clock.tick(mtime)  # Adjust the speed as needed
