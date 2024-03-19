@@ -101,6 +101,7 @@ WINDOW_SIZE = [env.shape[1] * (BLOCK_SIZE + MARGIN), env.shape[0] * (BLOCK_SIZE 
 screen = pygame.display.set_mode(WINDOW_SIZE)
 
 pygame.display.set_caption("Maze Game")
+font = pygame.font.Font(pygame.font.get_default_font(), 36)
 
 clock = pygame.time.Clock()
 
@@ -111,13 +112,36 @@ def draw_maze(env):
             color = WHITE
             if env[row][col] == -1:
                 color = WALL
+                wall_image = pygame.image.load("wall.png")
+                x = (MARGIN + BLOCK_SIZE) * col + MARGIN
+                y = (MARGIN + BLOCK_SIZE) * row + MARGIN
+                screen.blit(wall_image, (x, y))
             elif env[row][col] == 1:
                 color = PLAYER
+                player_image = pygame.image.load("farmer.png")
+                x = (MARGIN + BLOCK_SIZE) * col + MARGIN
+                y = (MARGIN + BLOCK_SIZE) * row + MARGIN
+                screen.blit(player_image, (x, y))
             elif env[row][col] == 2:
                 color = GOAL
-            pygame.draw.rect(screen, color, [(MARGIN + BLOCK_SIZE) * col + MARGIN,
-                                             (MARGIN + BLOCK_SIZE) * row + MARGIN,
-                                             BLOCK_SIZE, BLOCK_SIZE])
+                goal_image = pygame.image.load("gift.png")
+                x = (MARGIN + BLOCK_SIZE) * col + MARGIN
+                y = (MARGIN + BLOCK_SIZE) * row + MARGIN
+                screen.blit(goal_image, (x, y))
+
+                # pygame.draw.rect(screen, color, [(MARGIN + BLOCK_SIZE) * col + MARGIN,
+                #                                 (MARGIN + BLOCK_SIZE) * row + MARGIN,
+                #                                 BLOCK_SIZE, BLOCK_SIZE])
+
+            if env[row][col] == -1:
+                color = WALL
+                wall_image = pygame.image.load("wall.png")
+                x = (MARGIN + BLOCK_SIZE) * col + MARGIN
+                y = (MARGIN + BLOCK_SIZE) * row + MARGIN
+                screen.blit(wall_image, (x, y))
+
+            # text = font.render("5", True, color)
+            # screen.blit(text, (10, 10))
 
 # Define a variable to track if the player reached the goal
 reached_goal = False
