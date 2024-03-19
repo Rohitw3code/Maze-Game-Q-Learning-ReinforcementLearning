@@ -118,10 +118,16 @@ def draw_maze(env):
                 screen.blit(wall_image, (x, y))
             elif env[row][col] == 1:
                 color = PLAYER
-                player_image = pygame.image.load("farmer.png")
-                x = (MARGIN + BLOCK_SIZE) * col + MARGIN
-                y = (MARGIN + BLOCK_SIZE) * row + MARGIN
-                screen.blit(player_image, (x, y))
+                if (row,col) in holes:
+                    player_image = pygame.image.load("farmer_dead.png")
+                    x = (MARGIN + BLOCK_SIZE) * col + MARGIN
+                    y = (MARGIN + BLOCK_SIZE) * row + MARGIN
+                    screen.blit(player_image, (x, y))
+                else:
+                    player_image = pygame.image.load("farmer.png")
+                    x = (MARGIN + BLOCK_SIZE) * col + MARGIN
+                    y = (MARGIN + BLOCK_SIZE) * row + MARGIN
+                    screen.blit(player_image, (x, y))
             elif env[row][col] == 2:
                 color = GOAL
                 goal_image = pygame.image.load("gift.png")
@@ -142,6 +148,7 @@ def draw_maze(env):
 
             # text = font.render("5", True, color)
             # screen.blit(text, (10, 10))
+                
 
 # Define a variable to track if the player reached the goal
 reached_goal = False
@@ -181,6 +188,16 @@ action_map = {0: 'left',
               1: 'down',
               2: 'right',
               3: 'up'}
+
+def getHoles(matrix):
+    holes = []
+    for i,row in enumerate(matrix):
+        for j,col in enumerate(row):
+            if matrix[i][j] == -1:
+                holes.append((i,j))
+    return holes
+
+holes = getHoles(env)
 
 def setRMatrix(matrix,win,loss):
     for state,action in win:
