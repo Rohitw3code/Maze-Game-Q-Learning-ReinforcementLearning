@@ -198,6 +198,12 @@ win = [(14,2)]
 rmatrix = setRMatrix(rmatrix,win,loss)
 print(rmatrix)
 
+def max_random(lst):
+    ix = []
+    for i,v in enumerate(lst):
+        if v == max(lst):
+            ix.append(i)
+    return rd.choice(ix)
 
 maze = Env()
 state1 = 0
@@ -212,13 +218,8 @@ while running:
             running = False
 
     if not reached_goal:
-        if explore > 0:
-            action = rd.choice([0,1,2,3])        
-        else:
-            if all(qmatrix[state1] == qmatrix[state1][0]):
-                action = rd.choice([0,1,2,3])        
-            else:
-                action = np.argmax(qmatrix[state1])
+        action = max_random(qmatrix[state1])
+
         obs,end,reward = maze.step(action)
         state2 = (obs[0]*4)+obs[1]
         qmatrix[state1][action] = rmatrix[state1][action] + 0.8 * max(qmatrix[state2][a] for a in range(4))
@@ -233,18 +234,16 @@ while running:
             move_player(1, 0)
         elif action_map[action] == 'down':
             move_player(0, -1)
+
         if reward < 0:
             reached_goal = True
-            explore -= 1
-            print(f'explore : {explore}')
-            print(qmatrix)
-            # print(qmatrix,reward,rmatrix[state1][action],state1,action,state2)
 
         if reward > 0:
             reached_goal = True
             mtime = 10
             clock.tick(mtime)  # Adjust the speed as needed
         
+        print(qmatrix)
 
 
 
