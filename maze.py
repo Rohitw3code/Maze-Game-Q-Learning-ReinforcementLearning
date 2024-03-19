@@ -13,8 +13,8 @@ RED = (255, 0, 0)
 GOAL = (46, 134, 193)
 
 # Define constants
-BLOCK_SIZE = 60
-MARGIN = 10
+BLOCK_SIZE = 80
+MARGIN = 20
 
 # Define the maze
 env = np.array([[1, 0, 0, 0],
@@ -102,6 +102,7 @@ screen = pygame.display.set_mode(WINDOW_SIZE)
 
 pygame.display.set_caption("Maze Game")
 font = pygame.font.Font(pygame.font.get_default_font(), 36)
+
 
 clock = pygame.time.Clock()
 
@@ -227,6 +228,9 @@ state1 = 0
 explore = 80
 mtime = 30
 
+# Load the background image
+background_image = pygame.image.load("grass.png").convert()
+
 # Main game loop
 running = True
 while running:
@@ -263,9 +267,10 @@ while running:
         print(qmatrix)
 
 
+    # Fill the screen with the background image
+    screen.blit(background_image, (0, 0))
 
-
-    screen.fill(WHITE)
+    # screen.fill()
     draw_maze(env)
     if reached_goal:
         pygame.display.flip()
