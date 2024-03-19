@@ -22,6 +22,77 @@ env = np.array([[1, 0, 0, 0],
                 [0, 0, 0, -1],
                 [-1, 0, 0, 2]])
 
+class Env:
+    def __init__(self):
+        self.env = np.array([[0,0,0,0],
+                            [0,-1,0,-1],
+                            [0,0,0,-1],
+                            [-1,0,0,2]])
+        self.current_state = (0,0)
+        self.shape = self.env.shape
+        self.done = False
+        self.reward = 0
+
+    def terminate_state(self):
+        row,col = self.current_state
+        if self.env[row][col] == 2:
+            self.done = True
+            self.reward = 10
+        elif self.env[row][col] == -1:
+            self.done = True
+            self.reward = -10
+        else:
+            self.done = False
+            self.reward = 0
+    def reset(self):
+        self.env = np.array([[0,0,0,0],
+                            [0,-1,0,-1],
+                            [0,0,0,-1],
+                            [-1,0,0,2]])
+        self.current_state = (0,0)
+        self.shape = self.env.shape
+        self.done = False
+        self.reward = 0
+        
+
+    def step(self,action):
+        row,col = self.current_state
+        if action == 2:
+            if col+1 < self.shape[1]:
+                self.current_state = (row,col+1)
+        if action == 0:
+            if col-1 >= 0:
+                self.current_state = (row,col-1)
+        if action == 1:
+            if row-1 >= 0:
+                self.current_state = (row-1,col)
+        if action == 3:
+            if row+1 < self.shape[0]:
+                self.current_state = (row+1,col)
+
+        self.terminate_state()
+        return self.current_state , self.done , self.reward
+
+
+    def render(self):
+        row,col = self.env.shape
+        env_rend = ''
+        for i in range(row):
+            for j in range(col):
+                state = self.env[i][j]
+                if self.current_state == (i,j):
+                    env_rend += 'S'
+                elif state == 0:
+                    env_rend += 'F'
+                elif state == -1:
+                    env_rend += 'H'
+                else:
+                    env_rend += 'G'
+            env_rend += '\n'
+        print(env_rend)
+
+
+
 # Initialize pygame
 pygame.init()
 
@@ -87,6 +158,27 @@ action_map = {0: 'left',
               2: 'right',
               3: 'up'}
 
+def setRMatrix(matrix,win,loss):
+    for state,action in win:
+        matrix[state][action] = 10
+    for state,action in loss:
+        matrix[state][action] = -10
+    return matrix
+
+qmatrix = np.zeros((16,4))
+rmatrix = np.zeros((16,4))
+
+loss = [(1,3),(3,3),(4,2),(6,0),(6,2),(8,3),(9,1),(10,2),(13,0)]
+win = [(14,2)]
+
+rmatrix = setRMatrix(rmatrix,win,loss)
+print(rmatrix)
+
+
+maze = Env()
+state1 = 0
+explore = 80
+mtime = 60
 
 # Main game loop
 running = True
@@ -96,16 +188,40 @@ while running:
             running = False
 
     if not reached_goal:
-        action = rd.choice([0,1,2,3])        
+        if explore > 0:
+            action = rd.choice([0,1,2,3])        
+        else:
+            if all(qmatrix[state1] == qmatrix[state1][0]):
+                action = rd.choice([0,1,2,3])        
+            else:
+                action = np.argmax(qmatrix[state1])
+        obs,end,reward = maze.step(action)
+        state2 = (obs[0]*4)+obs[1]
+        qmatrix[state1][action] = rmatrix[state1][action] + 0.8 * max(qmatrix[state2][a] for a in range(4))
+        state1 = state2
+        # maze.render()
         # Move the player based on the random action
         if action_map[action] == 'left':
             move_player(-1, 0)
-        elif action_map[action] == 'down':
+        elif action_map[action] == 'up':
             move_player(0, 1)
         elif action_map[action] == 'right':
             move_player(1, 0)
-        elif action_map[action] == 'up':
+        elif action_map[action] == 'down':
             move_player(0, -1)
+        if reward < 0:
+            reached_goal = True
+            explore -= 1
+            print(f'explore : {explore}')
+            print(qmatrix)
+            # print(qmatrix,reward,rmatrix[state1][action],state1,action,state2)
+
+        if reward > 0:
+            reached_goal = True
+            mtime = 10
+            clock.tick(mtime)  # Adjust the speed as needed
+        
+
 
 
 
@@ -119,8 +235,10 @@ while running:
                         [0, -1, 0, -1],
                         [0, 0, 0, -1],
                         [-1, 0, 0, 2]])
+        maze.reset()
+        print("="*20)
 
     pygame.display.flip()
-    clock.tick(60)  # Adjust the speed as needed
+    clock.tick(mtime)  # Adjust the speed as needed
 
 pygame.quit()
