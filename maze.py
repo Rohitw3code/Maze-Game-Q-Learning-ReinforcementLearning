@@ -120,12 +120,12 @@ def draw_maze(env):
             elif env[row][col] == 1:
                 color = PLAYER
                 if (row,col) in holes:
-                    player_image = pygame.image.load("farmer_dead.png")
+                    player_image = pygame.image.load("cowboy_dead.png")
                     x = (MARGIN + BLOCK_SIZE) * col + MARGIN
                     y = (MARGIN + BLOCK_SIZE) * row + MARGIN
                     screen.blit(player_image, (x, y))
                 else:
-                    player_image = pygame.image.load("farmer.png")
+                    player_image = pygame.image.load("cowboy.png")
                     x = (MARGIN + BLOCK_SIZE) * col + MARGIN
                     y = (MARGIN + BLOCK_SIZE) * row + MARGIN
                     screen.blit(player_image, (x, y))
@@ -230,6 +230,7 @@ mtime = 30
 
 # Load the background image
 background_image = pygame.image.load("grass.png").convert()
+discount_factor = 0.8
 
 # Main game loop
 running = True
@@ -243,7 +244,7 @@ while running:
 
         obs,end,reward = maze.step(action)
         state2 = (obs[0]*4)+obs[1]
-        qmatrix[state1][action] = rmatrix[state1][action] + 0.8 * max(qmatrix[state2][a] for a in range(4))
+        qmatrix[state1][action] = rmatrix[state1][action] + discount_factor * max(qmatrix[state2][a] for a in range(4))
         state1 = state2
         # maze.render()
         # Move the player based on the random action
